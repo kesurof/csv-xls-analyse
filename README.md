@@ -1,6 +1,6 @@
 # CSV/XLS Analyse
 
-Cette application Streamlit permet d’importer plusieurs fichiers CSV ou ZIP, de fusionner les données et de télécharger un classeur Excel multi-feuilles généré en mémoire.
+Cette application Streamlit permet d’importer plusieurs fichiers CSV ou ZIP, de fusionner les données et de télécharger un fichier Excel contenant une seule feuille "Fusion" regroupant toutes les données.
 
 ## Prérequis
 
