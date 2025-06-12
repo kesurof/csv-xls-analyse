@@ -19,7 +19,10 @@ def read_csv_file(file_data) -> pd.DataFrame:
         if df[col].str.contains(",").any():
             df[col] = df[col].str.replace(" ", "")
             df[col] = df[col].str.replace(",", ".")
-            df[col] = pd.to_numeric(df[col], errors="ignore")
+            try:
+                df[col] = pd.to_numeric(df[col])
+            except (ValueError, TypeError):
+                pass
     return df
 
 
