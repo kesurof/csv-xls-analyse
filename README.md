@@ -1,12 +1,21 @@
 # CSV/XLS Analyse
 
-This repository previously included Python tools for merging CSV files, generating Excel reports and a Streamlit interface. The source code has been removed and only this README remains for reference. Check the Git history for earlier versions of the project.
+Cette application Streamlit permet d’importer plusieurs fichiers CSV ou ZIP, de fusionner les données et de télécharger un classeur Excel multi-feuilles généré en mémoire.
 
-## Pré-requis
+## Prérequis
 
-Pour lancer un script Python utilisant Streamlit vous pouvez installer les dépendances listées dans `requirements.txt` :
+Installez les dépendances nécessaires :
 
 ```bash
 pip install -r requirements.txt
 ```
 
+## Exécution
+
+Lancez l’application avec Streamlit :
+
+```bash
+streamlit run app.py
+```
+
+Un navigateur s’ouvrira avec l’interface d’upload et de conversion.
