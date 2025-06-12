@@ -1,7 +1,11 @@
 import io
 import streamlit as st
 
-from .core import merge_csv_files, create_export_excel, analyse_consumption
+from csv_xls_analyse.core import (
+    merge_csv_files,
+    create_export_excel,
+    analyse_consumption,
+)
 
 
 def main():
