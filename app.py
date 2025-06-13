@@ -110,6 +110,15 @@ def compute_moyenne_conso(df: pd.DataFrame) -> pd.DataFrame:
     return pivot
 
 
+def filter_echanges(df: pd.DataFrame) -> pd.DataFrame:
+    """Return rows where 'Nom de la sous-rubrique' starts with 'Echanges'."""
+    column = "Nom de la sous-rubrique"
+    if column not in df.columns:
+        return pd.DataFrame()
+    mask = df[column].astype(str).str.startswith("Echanges", na=False)
+    return df.loc[mask].copy()
+
+
 def read_csv_file(file_data) -> pd.DataFrame:
     """Read a CSV file with predefined parameters."""
     df = pd.read_csv(
@@ -164,13 +173,13 @@ def main():
                 return
 
             merged = pd.concat(all_dfs, ignore_index=True)
-            moyenne_df = compute_moyenne_conso(merged)
+            echanges_df = filter_echanges(merged)
 
             buffer = BytesIO()
             with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
                 merged.to_excel(writer, sheet_name="Fusion", index=False)
-                if not moyenne_df.empty:
-                    moyenne_df.to_excel(
+                if not echanges_df.empty:
+                    echanges_df.to_excel(
                         writer, sheet_name="Moyenne conso DATA", index=False
                     )
             buffer.seek(0)
