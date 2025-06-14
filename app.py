@@ -47,7 +47,6 @@ def compute_moyenne_conso(df: pd.DataFrame) -> pd.DataFrame:
         "Nom de la sous-rubrique",
         "Période de la facture",
         "Quantité ou volume",
-        "Nom de la rubrique de niveau 1",
         "Numéro de l’utilisateur",
         "Nom de l’utilisateur",
         "Prénom de l’utilisateur",
@@ -70,8 +69,8 @@ def compute_moyenne_conso(df: pd.DataFrame) -> pd.DataFrame:
     df["month"] = df["date"].dt.to_period("M")
     df["bytes"] = df["Quantité ou volume"].apply(parse_volume)
 
+    # Cumulate data per user number while keeping the main identity columns
     id_cols = [
-        "Nom de la rubrique de niveau 1",
         "Numéro de l’utilisateur",
         "Nom de l’utilisateur",
         "Prénom de l’utilisateur",
@@ -173,13 +172,13 @@ def main():
                 return
 
             merged = pd.concat(all_dfs, ignore_index=True)
-            echanges_df = filter_echanges(merged)
+            moyenne_df = compute_moyenne_conso(merged)
 
             buffer = BytesIO()
             with pd.ExcelWriter(buffer, engine="openpyxl") as writer:
                 merged.to_excel(writer, sheet_name="Fusion", index=False)
-                if not echanges_df.empty:
-                    echanges_df.to_excel(
+                if not moyenne_df.empty:
+                    moyenne_df.to_excel(
                         writer, sheet_name="Moyenne conso DATA", index=False
                     )
             buffer.seek(0)
