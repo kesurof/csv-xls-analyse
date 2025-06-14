@@ -47,6 +47,7 @@ def compute_moyenne_conso(df: pd.DataFrame) -> pd.DataFrame:
         "Nom de la sous-rubrique",
         "Période de la facture",
         "Quantité ou volume",
+        "Nom de la rubrique de niveau 1",
         "Numéro de l’utilisateur",
         "Nom de l’utilisateur",
         "Prénom de l’utilisateur",
@@ -69,16 +70,27 @@ def compute_moyenne_conso(df: pd.DataFrame) -> pd.DataFrame:
     df["month"] = df["date"].dt.to_period("M")
     df["bytes"] = df["Quantité ou volume"].apply(parse_volume)
 
-    # Cumulate data per user number while keeping the main identity columns
+    # Columns describing the user identity
     id_cols = [
+        "Nom de la rubrique de niveau 1",
         "Numéro de l’utilisateur",
         "Nom de l’utilisateur",
         "Prénom de l’utilisateur",
         "Numéro de téléphone",
     ]
 
-    grouped = df.groupby(id_cols + ["month"])["bytes"].sum().reset_index()
-    pivot = grouped.pivot(index=id_cols, columns="month", values="bytes").fillna(0)
+    # Unique information for each user
+    identity = (
+        df[id_cols]
+        .drop_duplicates(subset="Numéro de l’utilisateur")
+        .set_index("Numéro de l’utilisateur")
+    )
+
+    # Aggregate monthly volume per user number
+    grouped = (
+        df.groupby(["Numéro de l’utilisateur", "month"])["bytes"].sum().reset_index()
+    )
+    pivot = grouped.pivot(index="Numéro de l’utilisateur", columns="month", values="bytes").fillna(0)
 
     sorted_months = sorted(pivot.columns, reverse=True)
     total_bytes = pivot[sorted_months].sum(axis=1)
@@ -102,9 +114,19 @@ def compute_moyenne_conso(df: pd.DataFrame) -> pd.DataFrame:
     for col in month_cols:
         pivot[col] = pivot[col].apply(lambda x: format_volume(int(x)))
 
+    pivot = pivot.merge(identity, left_index=True, right_index=True, how="left")
     pivot.reset_index(inplace=True)
 
-    column_order = id_cols + ["Total (Go)", "Moyenne (Go) 4 mois", "Moyenne (Go) total"] + month_cols
+    column_order = [
+        "Nom de la rubrique de niveau 1",
+        "Numéro de l’utilisateur",
+        "Nom de l’utilisateur",
+        "Prénom de l’utilisateur",
+        "Numéro de téléphone",
+        "Total (Go)",
+        "Moyenne (Go) 4 mois",
+        "Moyenne (Go) total",
+    ] + month_cols
     pivot = pivot[column_order]
     return pivot
 
